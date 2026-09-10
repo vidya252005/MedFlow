@@ -1,12 +1,6 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "services" / "feature-service"))
-
-from app.main import extract_bed_features, extract_vital_features  # noqa: E402
+from medflow_shared.features import extract_bed_features, extract_vital_features
 
 
 def test_vital_features_mean_and_missing() -> None:

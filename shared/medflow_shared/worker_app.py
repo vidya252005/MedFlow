@@ -3,7 +3,8 @@ from __future__ import annotations
 import asyncio
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from medflow_shared.health import router as health_router
 
@@ -15,6 +16,10 @@ def health_app(service: str) -> FastAPI:
     @app.get("/health/ready")
     async def ready() -> dict[str, str]:
         return {"status": "ok", "service": service}
+
+    @app.get("/metrics")
+    async def metrics() -> Response:
+        return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
     return app
 

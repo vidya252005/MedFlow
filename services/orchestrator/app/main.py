@@ -8,7 +8,7 @@ from app.models import ModelExecutor, ModelFactory
 from app.router import ModelRouter
 from medflow_shared.config import Settings
 from medflow_shared.db import session_scope
-from medflow_shared.events import FeatureVector, HealthcareEvent, Prediction
+from medflow_shared.events import FeatureVector, HealthcareEvent
 from medflow_shared.kafka import KafkaProducer, KafkaWorker, ensure_topics
 from medflow_shared.logging import configure_logging, get_logger
 from medflow_shared.metrics import PIPELINE_LATENCY, PREDICTIONS_GENERATED

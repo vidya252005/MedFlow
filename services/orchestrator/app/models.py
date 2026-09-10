@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import time
 from abc import ABC, abstractmethod
 from typing import Any
@@ -11,7 +10,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LogisticRegression
 
 from medflow_shared.circuit import RedisCircuitBreaker
-from medflow_shared.events import FeatureVector, Prediction
+from medflow_shared.events import Prediction
 from medflow_shared.metrics import MODEL_ERRORS, MODEL_INFERENCE, MODEL_LATENCY, MODEL_TIMEOUTS
 from medflow_shared.registry import ModelMetadata, model_hash
 

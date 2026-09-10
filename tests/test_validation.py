@@ -3,6 +3,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from medflow_shared.config import Settings
+from medflow_shared.events import EventType, HealthcareEvent
+from medflow_shared.validation import parse_event, validate_event
 
 
 def make_event(**overrides) -> dict:
@@ -62,10 +64,9 @@ def test_invalid_timestamp() -> None:
 
 
 def test_unsupported_schema_fails_parse() -> None:
-    from pydantic import ValidationError as PydanticError
     from medflow_shared.errors import ValidationError
 
-    with pytest.raises((ValidationError, PydanticError)):
+    with pytest.raises(ValidationError):
         parse_event(make_event(schema_version=9))
 
 

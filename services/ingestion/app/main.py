@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from medflow_shared.config import Settings

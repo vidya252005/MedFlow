@@ -1,3 +1,2 @@
-# Convenience wrapper. Prefer `docker compose` from the repository root.
-include:
-  - path: ../docker-compose.yml
+# See the repository-root docker-compose.yml (build context is the repo root).
+#   docker compose up --build

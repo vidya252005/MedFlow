@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-from medflow_shared.events import EventType, FeatureVector, HealthcareEvent, Prediction
+from medflow_shared.events import FeatureVector, HealthcareEvent, Prediction
+from tests.imports import load
 from tests.test_validation import make_event
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "services" / "rules-engine"))
-
-from app.evaluator import LowSpo2Rule, aggregate  # noqa: E402
+evaluator = load("rules_evaluator", "services/rules-engine/app/evaluator.py")
 
 
 def _ctx(spo2=None, hr=80, extra=None):
@@ -20,18 +15,18 @@ def _ctx(spo2=None, hr=80, extra=None):
 
 
 def test_low_spo2_triggers_high() -> None:
-    result = LowSpo2Rule().evaluate(_ctx(spo2=91))
+    result = evaluator.LowSpo2Rule().evaluate(_ctx(spo2=91))
     assert result.triggered
     assert result.severity == "HIGH"
 
 
 def test_spo2_normal() -> None:
-    result = LowSpo2Rule().evaluate(_ctx(spo2=97))
+    result = evaluator.LowSpo2Rule().evaluate(_ctx(spo2=97))
     assert not result.triggered
 
 
 def test_missing_spo2() -> None:
-    result = LowSpo2Rule().evaluate(_ctx(spo2=None))
+    result = evaluator.LowSpo2Rule().evaluate(_ctx(spo2=None))
     assert not result.triggered
 
 
@@ -50,7 +45,9 @@ def test_aggregate_review_recommended() -> None:
         Prediction(model_name="anomaly_detector", model_version="2.1", score=0.94, confidence=0.91, status="success"),
         Prediction(model_name="risk_predictor", model_version="1.4", score=0.81, confidence=0.8, status="success"),
     ]
-    decision = aggregate(event, features, predictions, {"anomaly_detector": 0.45, "risk_predictor": 0.3, "rules": 0.25})
+    decision = evaluator.aggregate(
+        event, features, predictions, {"anomaly_detector": 0.45, "risk_predictor": 0.3, "rules": 0.25}
+    )
     assert decision.severity in {"HIGH", "CRITICAL"}
     assert decision.action == "REVIEW_RECOMMENDED"
     assert "low_spo2" in decision.triggered_rules
