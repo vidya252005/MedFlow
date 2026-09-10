@@ -1,0 +1,3 @@
+# Convenience wrapper. Prefer `docker compose` from the repository root.
+include:
+  - path: ../docker-compose.yml

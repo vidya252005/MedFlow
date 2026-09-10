@@ -1,0 +1,116 @@
+models:
+  - name: anomaly_detector
+    version: "2.1"
+    timeout_ms: 150
+    enabled: true
+    fallback: threshold_detector
+    shadow: false
+    input_features:
+      - heart_rate
+      - spo2
+      - respiratory_rate
+      - heart_rate_mean_5m
+      - spo2_delta_5m
+      - hr_variance_5m
+
+  - name: threshold_detector
+    version: "1.0"
+    timeout_ms: 20
+    enabled: true
+    fallback: null
+    shadow: false
+    input_features:
+      - heart_rate
+      - spo2
+      - respiratory_rate
+
+  - name: risk_predictor
+    version: "1.4"
+    timeout_ms: 200
+    enabled: true
+    fallback: null
+    shadow: false
+    input_features:
+      - heart_rate
+      - spo2
+      - respiratory_rate
+      - temperature_c
+      - systolic_bp
+      - heart_rate_mean_15m
+
+  - name: capacity_forecaster
+    version: "1.0"
+    timeout_ms: 80
+    enabled: true
+    fallback: null
+    shadow: false
+    input_features:
+      - occupancy_ratio
+      - occupied_count
+      - available_count
+
+  - name: imaging_prioritizer
+    version: "1.0"
+    timeout_ms: 60
+    enabled: true
+    fallback: null
+    shadow: false
+    input_features:
+      - waiting_minutes
+      - acuity_code
+      - modality_code
+
+  - name: data_quality_scorer
+    version: "1.0"
+    timeout_ms: 40
+    enabled: true
+    fallback: null
+    shadow: false
+    input_features:
+      - missing_ratio
+      - stale
+      - insufficient_observations
+
+  - name: anomaly_detector_shadow
+    version: "2.2-shadow"
+    timeout_ms: 150
+    enabled: true
+    fallback: null
+    shadow: true
+    input_features:
+      - heart_rate
+      - spo2
+      - respiratory_rate
+      - heart_rate_mean_5m
+
+routing:
+  patient_vital:
+    models:
+      - anomaly_detector
+      - risk_predictor
+      - data_quality_scorer
+      - anomaly_detector_shadow
+  device_reading:
+    models:
+      - data_quality_scorer
+  bed_status:
+    models:
+      - capacity_forecaster
+      - data_quality_scorer
+  imaging_request:
+    models:
+      - imaging_prioritizer
+  lab_result:
+    models:
+      - risk_predictor
+      - data_quality_scorer
+  resource_update:
+    models:
+      - capacity_forecaster
+  appointment_event:
+    models: []
+
+aggregation_weights:
+  anomaly_detector: 0.45
+  risk_predictor: 0.30
+  rules: 0.25
